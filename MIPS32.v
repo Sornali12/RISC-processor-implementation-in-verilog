@@ -9,7 +9,8 @@ module MIPS32_Pipelined (clk1, clk2);                       // Two-phase clock
     reg [31:0]  MEM_WB_IR, MEM_WB_ALUOut, MEM_WB_LMD;
 
     reg [31:0] Reg [0:31];          // Register bank (32 x 32)
-    reg [31:0] Mem [0:1023];         // 1024 x 32 memory
+    reg [31:0] Inst_Mem [0:1023];         // 1024 x 32 instruction memory
+    reg [31:0] Data_Mem [0:255];          // 256 x 32 data memory
 
     parameter ADD=6'b000000, SUB=6'b000001, AND=6'b000010, OR=6'b000011, SLT=6'b000100,
               MUL=6'b000101, HLT=6'b111111, LW=6'b001000, SW=6'b001001, ADDI=6'b001010, 
@@ -27,14 +28,14 @@ module MIPS32_Pipelined (clk1, clk2);                       // Two-phase clock
                 begin
                     if (((EX_MEM_IR[31:26] == BEQZ) && (EX_MEM_cond == 1)) || ((EX_MEM_IR[31:26] == BNEQZ) && (EX_MEM_cond == 0)))
                         begin
-                            IF_ID_IR <= #2 Mem[EX_MEM_ALUOut];
+                            IF_ID_IR <= #2 Inst_Mem[EX_MEM_ALUOut];
                             TAKEN_BRANCH <= #2 1'b1;
                             IF_ID_NPC <= #2 EX_MEM_ALUOut + 1;
                             PC <= #2 EX_MEM_ALUOut + 1;
                         end
                     else
                         begin
-                            IF_ID_IR <= #2 Mem[PC];
+                            IF_ID_IR <= #2 Inst_Mem[PC];
                             IF_ID_NPC <= #2 PC + 1;
                             PC <= #2 PC + 1;
                         end
@@ -122,9 +123,9 @@ module MIPS32_Pipelined (clk1, clk2);                       // Two-phase clock
 
                     case (EX_MEM_type)
                         RR_ALU, RM_ALU:   MEM_WB_ALUOut     <= #2 EX_MEM_ALUOut;
-                        LOAD:             MEM_WB_LMD        <= #2 Mem[EX_MEM_ALUOut];
+                        LOAD:             MEM_WB_LMD        <= #2 Data_Mem[EX_MEM_ALUOut];
                         STORE:      if (TAKEN_BRANCH == 0)                                      // Disable write
-                                        Mem[EX_MEM_ALUOut]  <= #2 EX_MEM_B;
+                                        Data_Mem[EX_MEM_ALUOut]  <= #2 EX_MEM_B;
                     endcase
                 end
         end
