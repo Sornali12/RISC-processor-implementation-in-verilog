@@ -21,15 +21,16 @@ module mips32_prog1;
             for (k=0; k<31; k++)  // Putting values in registers
                 mips.Reg[k] = k;
 
-            mips.Mem[0] = 32'h2801000a;    // ADDI   R1,R0,10
-            mips.Mem[1] = 32'h28020014;    // ADDI   R2,R0,20
-            mips.Mem[2] = 32'h28030019;    // ADDI   R3,R0,25
-            mips.Mem[3] = 32'h0ce77800;    // OR     R7,R7,R7  -- dummy instr.
-            mips.Mem[4] = 32'h0ce77800;    // OR     R7,R7,R7  -- dummy instr.
-            mips.Mem[5] = 32'h00222000;    // ADD    R4,R1,R2
-            mips.Mem[6] = 32'h0ce77800;    // OR     R7,R7,R7  -- dummy instr.
-            mips.Mem[7] = 32'h00832800;    // ADD    R5,R4,R3
-            mips.Mem[8] = 32'hfc000000;    // HLT
+            $readmemh("inst.txt",mips.Inst_Mem,0,8);
+          //  mips.Mem[0] = 32'h2801000a;    // ADDI   R1,R0,10
+          //  mips.Mem[1] = 32'h28020014;    // ADDI   R2,R0,20
+          //  mips.Mem[2] = 32'h28030019;    // ADDI   R3,R0,25
+          //  mips.Mem[3] = 32'h0ce77800;    // OR     R7,R7,R7  -- dummy instr.
+          //  mips.Mem[4] = 32'h0ce77800;    // OR     R7,R7,R7  -- dummy instr.
+          //  mips.Mem[5] = 32'h00222000;    // ADD    R4,R1,R2
+          //  mips.Mem[6] = 32'h0ce77800;    // OR     R7,R7,R7  -- dummy instr.
+          //  mips.Mem[7] = 32'h00832800;    // ADD    R5,R4,R3
+          //  mips.Mem[8] = 32'hfc000000;    // HLT
             
             mips.HALTED = 0;
             mips.PC = 0;
@@ -42,7 +43,7 @@ module mips32_prog1;
 
     initial
         begin
-            $dumpfile ("mips.vcd");
+            $dumpfile ("prog1.vcd");
             $dumpvars (0, mips32_prog1);
             #300 $finish;
         end
